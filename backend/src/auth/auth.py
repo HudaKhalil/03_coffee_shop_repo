@@ -35,7 +35,6 @@ class AuthError(Exception):
 '''
 def get_token_auth_header():
     auth_header = request.headers.get('Authorization', None)
-    print(auth_header)
     # if no "Authorization" is part of header
     if auth_header is None:
         raise AuthError({

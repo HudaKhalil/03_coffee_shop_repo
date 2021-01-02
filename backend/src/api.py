@@ -1,3 +1,4 @@
+from logging import error
 import os
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
@@ -18,27 +19,12 @@ def get_error_message(error, default_text):
         return error['description']
     except TypeError:
         return default_text
-    
-# Query all drinks formatted long or short drink recipe description
-def get_all_drinks(recipe_format):
-    all_drinks = Drink.query.order_by(Drink.id).all()
-    if recipe_format.lower() == 'short':
-        all_drinks_formatted = [drink.short() for drink in all_drinks]
-    elif recipe_format.lower() == 'long':
-        all_drinks_formatted = [drink.long() for drink in all_drinks]
-    else:
-        return abort(400, {'message': 'bad formatted function call. recipe_format needs to be "short" or "long".'})
-
-    if len(all_drinks_formatted) == 0:
-        abort(404, {'message': 'no drinks found in database.'})
-    # Return formatted list of drinks
-    return all_drinks_formatted
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 #----------------------------------------------------------------------------#
 # ROUTES
 #----------------------------------------------------------------------------#
@@ -52,7 +38,8 @@ def get_all_drinks(recipe_format):
 '''
 @app.route('/drinks', methods=['GET'])
 def drinks():
-    drinks = get_all_drinks('short')
+    all_drinks = Drink.query.order_by(Drink.id).all()
+    drinks = [drink.short() for drink in all_drinks]
     if drinks is None:
         abort(400, {'message': 'No drinks found in menu'})
 
@@ -71,9 +58,12 @@ def drinks():
 @app.route('/drinks-detail',  methods=['GET'])
 @requires_auth('get:drinks-detail')
 def drinks_detail(jwt):
-    drinks = get_all_drinks('long')
-    print(drinks)
-    if drinks is None:
+    all_drinks = Drink.query.order_by(Drink.id).all()
+    if not all_drinks:
+        abort(400, {'message': 'No drinks found in menu'})
+    drinks = [drink.long() for drink in all_drinks]
+    
+    if not drinks:
         abort(400, {'message': 'No drinks found in menu'})
         
     return jsonify({
@@ -93,7 +83,6 @@ def drinks_detail(jwt):
 @requires_auth('post:drinks')
 def create_drink(jwt):
     req = request.get_json()
-
     try:
         req_recipe = req['recipe']
         if isinstance(req_recipe, dict):
@@ -122,7 +111,41 @@ def create_drink(jwt):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>',  methods=['PATCH'])
+@requires_auth('patch:drinks')
+def edit_drink(jwt, drink_id):
+    
+    body = request.get_json()
 
+    if not body:
+      abort(400, {'message': 'request does not contain a valid JSON body.'})
+
+    # Get drink by id
+    drink = Drink().query.filter_by(id = drink_id).one_or_none()
+    
+    if drink is None:
+        abort(404, {'message': 'Drink ID not found'})
+        
+    try:
+        # Check fields that should be updated
+        new_title = body.get('title', None)
+        new_recipe = body.get('recipe', None)
+
+        
+        if new_title:
+            drink.title = body['title']
+
+        if new_recipe:
+            drink.recipe = """{}""".format(body['recipe'])
+
+        drink.update()
+
+        return jsonify({
+            'success': True,
+            'drinks': [Drink.long(drink)]
+        })
+    except Exception:
+        abort(422, {'message': 'Drink can not be updated'})
 
 '''
 @TODO implement endpoint
@@ -135,6 +158,27 @@ def create_drink(jwt):
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks/<int:drink_id>',  methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drinks(jwt, drink_id):
+   
+    drink = Drink.query.filter_by(id = drink_id).one_or_none()
+    if drink_id is None:
+        abort(404, {'message': 'Please provide valid drink id'})
+        
+    try:
+        if not drink:
+            abort(
+                422, {'message': 'Drink with id {} not found in database.'.format(drink_id)})
+
+        drink.delete()
+
+        return jsonify({
+            'success': True,
+            'delete': drink_id
+        })
+    except Exception:
+        abort(422, {'message': 'Drink can not be deleted'})
 
 ## Error Handling
 '''
@@ -145,9 +189,8 @@ def unprocessable(error):
     return jsonify({
         "success": False,
         "error": 422,
-        "message": "unprocessable"
+        "message": get_error_message(error, "unprocessable")
     }), 422
-
 
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
@@ -159,14 +202,51 @@ def unprocessable(error):
                     }), 404
 
 '''
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": get_error_message(error, "resource not found")
+    }), 400
+    
+    
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": get_error_message(error, "unathorized")
+    }), 401
+    
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return jsonify({
+        "success": False,
+        "error": 405,
+        "message": get_error_message(error, "method not allowed")
+    }), 405
 
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
-
-
+@app.errorhandler(404)
+def ressource_not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": get_error_message(error, "resource not found")
+    }), 404
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(AuthError)
+def auth_error(error):
+    return jsonify({
+        "success": False,
+        "error": error.status_code,
+        "message": error.error['description']
+    }), error.status_code
