@@ -28,7 +28,108 @@ db_drop_and_create_all()
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
+    # db_init_records()
 
+
+# def db_init_records():
+#     '''this will initialize the database with some test drinks.
+    
+#     called on every restart, after database has been reseted by db_drop_and_create_all()
+#     '''
+#     new_drink1 = (Drink(
+#         id=1,
+#         title='Matcha Shake',
+#         recipe="""[
+#                                 {
+#                                     "name" : "milk",
+#                                     "color": "grey",
+#                                     "parts": 1
+#                                 },
+#                                 {
+#                                     "name" : "matcha",
+#                                     "color": "green",
+#                                     "parts": 3
+#                                 }
+#                         ]"""
+#     ))
+
+#     new_drink2 = (Drink(
+#         id=2,
+#         title='Purple Pain',
+#         recipe="""[
+#                                 {   
+#                                     "name" : "guave",
+#                                     "color": "purple",
+#                                     "parts": 3
+#                                 },
+#                                 {
+#                                     "name": "milk",
+#                                     "color": "black",
+#                                     "parts": 2
+#                                 }
+#                         ]"""
+#     ))
+
+#     new_drink3 = (Drink(
+#         id=3,
+#         title='Rainbow Dash',
+#         recipe="""[
+#                             {   
+#                                 "name" : "cheery",
+#                                 "color": "red",
+#                                 "parts": 1
+#                             },
+#                             {
+#                                 "name": "lemon",
+#                                 "color": "yellow",
+#                                 "parts": 1
+#                             },
+#                             {
+#                                 "name": "apple",
+#                                 "color": "green",
+#                                 "parts": 1
+#                             },
+#                             {
+#                                 "name": "blueberry",
+#                                 "color": "blue",
+#                                 "parts": 1
+#                             },
+#                             {
+#                                 "name": "grape",
+#                                 "color": "purple",
+#                                 "parts": 1
+#                             }
+#                     ]"""
+#     ))
+
+#     new_drink4 = (Drink(
+#         id=4,
+#         title='Test',
+#         recipe="""[
+#                         {   
+#                             "name" : "cheery",
+#                             "color": "burlywood",
+#                             "parts": 1
+#                         },
+#                         {
+#                             "name": "lemon",
+#                             "color": "peru",
+#                             "parts": 1
+#                         },
+#                         {
+#                             "name": "",
+#                             "color": "saddlebrown",
+#                             "parts": 1
+#                         }
+#                 ]"""
+#     ))
+
+#     new_drink1.insert()
+#     new_drink2.insert()
+#     new_drink3.insert()
+#     new_drink4.insert()
+
+    # print(new_drink4.short())
 '''
 Drink
 a persistent drink entity, extends the base SQLAlchemy Model
