@@ -53,12 +53,22 @@ The `--reload` flag will detect file changes and restart the server automaticall
 ### Setup Auth0
 
 1. Create a new Auth0 Account
+
 2. Select a unique tenant domain
+```bash
+    karma-designs.eu.auth0.com
+```
 3. Create a new, single page web application
+```
+    Coffee_Shop_HK
+```
 4. Create a new API
     - in API Settings:
         - Enable RBAC
         - Enable Add Permissions in the Access Token
+```bash
+    Coffee_API
+``` 
 5. Create new API permissions:
     - `get:drinks-detail`
     - `post:drinks`
@@ -70,16 +80,19 @@ The `--reload` flag will detect file changes and restart the server automaticall
     - Manager
         - can perform all actions
 7. Test your endpoints with [Postman](https://getpostman.com). 
-    - Register 2 users - assign the Barista role to one and Manager role to the other.
-    - Sign into each account and make note of the JWT.
-    - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
-    - Right-clicking the collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
-    - Run the collection and correct any errors.
-    - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
+ 
+ ## Testing
 
-### Implement The Server
+Usign`Postman Collections` to test all my Endpoints for expected behaviour & correct permission execution.
 
-There are `@TODO` comments throughout the `./backend/src`. We recommend tackling the files in order and from top to bottom:
+To execute the tests, follow these steps:
 
-1. `./src/auth/auth.py`
-2. `./src/api.py`
+1. Run the server
+```bash
+    flask run
+```
+2. Install [Postman](https://www.getpostman.com/downloads/)
+3. Download the `Postman Collection` in this Repo (`udacity-fsnd-udaspicelatte.postman_collection.json`)
+4. Open `Postman` and click on "Import" on the upper-left corner
+5. Select `udacity-fsnd-udaspicelatte.postman_collection.json`
+6. Once uploaded, you can simple click on "Runner" (right next to "Import") and start all tests.

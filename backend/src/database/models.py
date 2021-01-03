@@ -28,7 +28,7 @@ db_drop_and_create_all()
 def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
-    db_init_records()
+    # db_init_records()
 
 
 def db_init_records():
@@ -51,16 +51,16 @@ def db_init_records():
 
     new_drink2 = (Drink(
         id=2,
-        title='Purple Pain',
+        title='Nespresso',
         recipe="""[
                                 {   
-                                    "name" : "guave",
-                                    "color": "purple",
+                                    "name" : "coffe1",
+                                    "color": "navajowhite",
                                     "parts": 3
                                 },
                                 {
                                     "name": "milk",
-                                    "color": "black",
+                                    "color": "white",
                                     "parts": 2
                                 }
                         ]"""
@@ -68,31 +68,31 @@ def db_init_records():
 
     new_drink3 = (Drink(
         id=3,
-        title='Rainbow Dash',
+        title='Mocha',
         recipe="""[
                             {   
-                                "name" : "cheery",
-                                "color": "red",
+                                "name" : "cho1",
+                                "color": "blanchedalmond",
                                 "parts": 1
                             },
                             {
-                                "name": "lemon",
-                                "color": "yellow",
+                                "name": "cho2",
+                                "color": "burlywood",
                                 "parts": 1
                             },
                             {
-                                "name": "apple",
-                                "color": "green",
+                                "name": "cho2",
+                                "color": "peru",
                                 "parts": 1
                             },
                             {
-                                "name": "blueberry",
-                                "color": "blue",
+                                "name": "milk",
+                                "color": "cornsilk",
                                 "parts": 1
                             },
                             {
-                                "name": "grape",
-                                "color": "purple",
+                                "name": "coffe",
+                                "color": "black",
                                 "parts": 1
                             }
                     ]"""
@@ -100,20 +100,20 @@ def db_init_records():
 
     new_drink4 = (Drink(
         id=4,
-        title='Test',
+        title='Flat White',
         recipe="""[
                         {   
-                            "name" : "cheery",
+                            "name" : "coffe1",
                             "color": "burlywood",
                             "parts": 1
                         },
                         {
-                            "name": "lemon",
+                            "name": "coffe2",
                             "color": "peru",
                             "parts": 1
                         },
                         {
-                            "name": "",
+                            "name": "coffe3",
                             "color": "saddlebrown",
                             "parts": 1
                         }

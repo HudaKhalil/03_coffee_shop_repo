@@ -80,13 +80,13 @@ def check_permissions(permission, payload):
         raise AuthError({
             'code': 'invalid_claims',
             'description': 'Permissions not included in JWT.'
-        }, 400)
+        }, 401)
 
     if permission not in payload['permissions']:
         raise AuthError({
             'code': 'unauthorized',
             'description': 'You dont have permission'
-        }, 403)
+        }, 401)
     return True
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -155,13 +155,13 @@ def verify_decode_jwt(token):
             raise AuthError({
                 'code': 'invalid_header',
                 'description': 'Unable to parse authentication token.'
-            }, 400)
+            }, 401)
 
     # If no payload has been returned yet, raise error.
     raise AuthError({
         'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
-    }, 400)
+    }, 401)
 
 '''
 @TODO implement @requires_auth(permission) decorator method

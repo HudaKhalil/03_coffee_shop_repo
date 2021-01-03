@@ -24,7 +24,7 @@ def get_error_message(error, default_text):
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+# db_drop_and_create_all()
 #----------------------------------------------------------------------------#
 # ROUTES
 #----------------------------------------------------------------------------#
@@ -62,9 +62,6 @@ def drinks_detail(jwt):
     if not all_drinks:
         abort(400, {'message': 'No drinks found in menu'})
     drinks = [drink.long() for drink in all_drinks]
-    
-    if not drinks:
-        abort(400, {'message': 'No drinks found in menu'})
         
     return jsonify({
         'success': True,
@@ -96,7 +93,7 @@ def create_drink(jwt):
         else:
             abort(422, {'message': 'unable to create new drink'})
     except:
-        abort(400, {'message': 'No new drinks added to menu'})
+        abort(401, {'message': 'Not authorized to create new drink'})
 
 
     return jsonify({'success': True, 'drinks': [drink.long()]})
@@ -162,14 +159,14 @@ def edit_drink(jwt, drink_id):
 @requires_auth('delete:drinks')
 def delete_drinks(jwt, drink_id):
    
-    drink = Drink.query.filter_by(id = drink_id).one_or_none()
     if drink_id is None:
         abort(404, {'message': 'Please provide valid drink id'})
         
     try:
+        drink = Drink.query.filter_by(id=drink_id).one_or_none()
         if not drink:
             abort(
-                422, {'message': 'Drink with id {} not found in database.'.format(drink_id)})
+                400, {'message': 'Drink with id {} not found in database.'.format(drink_id)})
 
         drink.delete()
 
@@ -178,7 +175,8 @@ def delete_drinks(jwt, drink_id):
             'delete': drink_id
         })
     except Exception:
-        abort(422, {'message': 'Drink can not be deleted'})
+        abort(401, {'message': 'Drink can not be deleted'})
+        # abort(error)
 
 ## Error Handling
 '''
@@ -207,7 +205,7 @@ def bad_request(error):
     return jsonify({
         "success": False,
         "error": 400,
-        "message": get_error_message(error, "resource not found")
+        "message": "resource not found"
     }), 400
     
     
@@ -216,7 +214,7 @@ def unauthorized(error):
     return jsonify({
         "success": False,
         "error": 401,
-        "message": get_error_message(error, "unathorized")
+        "message": "unathorized"
     }), 401
     
 
@@ -225,7 +223,7 @@ def method_not_allowed(error):
     return jsonify({
         "success": False,
         "error": 405,
-        "message": get_error_message(error, "method not allowed")
+        "message": "method not allowed"
     }), 405
 
 '''
@@ -237,8 +235,17 @@ def ressource_not_found(error):
     return jsonify({
         "success": False,
         "error": 404,
-        "message": get_error_message(error, "resource not found")
+        "message": "resource not found"
     }), 404
+    
+
+@app.errorhandler(403)
+def ressource_not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 403,
+        "message": "forbidden"
+    }), 403
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
@@ -250,3 +257,4 @@ def auth_error(error):
         "error": error.status_code,
         "message": error.error['description']
     }), error.status_code
+
